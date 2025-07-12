@@ -5,7 +5,7 @@ let imagebtn=document.querySelector("#image")
 let image=document.querySelector("#image img")
 let imageinput=document.querySelector("#image input")
 
-const Api_Url = "/.netlify/functions/chatgpt.js";
+const Api_Url = "/.netlify/functions/gemini"; // ✅ Now we’ll use a secure backend call
 
 let user={
     message:null,
@@ -16,34 +16,34 @@ let user={
 }
  
 async function generateResponse(aiChatBox) {
-    let text = aiChatBox.querySelector(".ai-chat-area");
 
-    let RequestOption = {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            message: user.message // your Netlify function expects this
+let text=aiChatBox.querySelector(".ai-chat-area")
+    let RequestOption={
+        method:"POST",
+        headers:{'Content-Type' : 'application/json'},
+        body:JSON.stringify({
+            "contents":[
+                {"parts":[{text:user.message},(user.file.data?[{inline_data:user.file}]:[])
+
+                ]
+            }]
         })
-    };
-
-    try {
-        let response = await fetch(Api_Url, RequestOption);
-        let data = await response.json();
-
-        if (!data.reply) {
-            throw new Error("No reply in response");
-        }
-
-        let apiResponse = data.reply.trim();
-        text.innerHTML = apiResponse;
-    } catch (error) {
-        console.error("Chatbot error:", error);
-        text.innerHTML = "❌ Failed to get response from AI.";
-    } finally {
-        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
-        image.src = `img.svg`;
-        image.classList.remove("choose");
-        user.file = {};
+    }
+    try{
+        let response= await fetch(Api_Url,RequestOption)
+        let data=await response.json()
+       let apiResponse=data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim()
+       text.innerHTML=apiResponse    
+    }
+    catch(error){
+        console.log(error);
+        
+    }
+    finally{
+        chatContainer.scrollTo({top:chatContainer.scrollHeight,behavior:"smooth"})
+        image.src=`img.svg`
+        image.classList.remove("choose")
+        user.file={}
     }
 }
 
