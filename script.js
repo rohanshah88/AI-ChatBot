@@ -5,7 +5,7 @@ let imagebtn=document.querySelector("#image")
 let image=document.querySelector("#image img")
 let imageinput=document.querySelector("#image input")
 
-const Api_Url = "/.netlify/functions/chatgpt";
+const Api_Url = "/.netlify/functions/chatgpt.js";
 
 let user={
     message:null,
@@ -22,18 +22,23 @@ async function generateResponse(aiChatBox) {
         method: "POST",
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            message: user.message  // send simple string message
+            message: user.message // your Netlify function expects this
         })
     };
 
     try {
         let response = await fetch(Api_Url, RequestOption);
         let data = await response.json();
+
+        if (!data.reply) {
+            throw new Error("No reply in response");
+        }
+
         let apiResponse = data.reply.trim();
         text.innerHTML = apiResponse;
     } catch (error) {
-        console.log("Error fetching response:", error);
-        text.innerHTML = "Sorry, I couldn’t get a response. 😓";
+        console.error("Chatbot error:", error);
+        text.innerHTML = "❌ Failed to get response from AI.";
     } finally {
         chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
         image.src = `img.svg`;
@@ -41,7 +46,6 @@ async function generateResponse(aiChatBox) {
         user.file = {};
     }
 }
-
 
 
 
