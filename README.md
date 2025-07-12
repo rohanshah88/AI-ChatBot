@@ -7,7 +7,7 @@
 
 ---
 
-> ⚡ **Live Demo**: [Click to Open the Chatbot](https://your-app-name.onrender.com)  
+> ⚡ **Live Demo**: [Click to Open the Chatbot](https://ai-chatbot-tmzu.onrender.com)  
 > 📦 **Source Code**: [GitHub Repository](https://github.com/rohanshah88/ai-chatbot)
 
 ---
