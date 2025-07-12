@@ -5,7 +5,7 @@ let imagebtn=document.querySelector("#image")
 let image=document.querySelector("#image img")
 let imageinput=document.querySelector("#image input")
 
-const Api_Url = "/.netlify/functions/gemini"; // ✅ Now we’ll use a secure backend call
+const Api_Url = "/api/gemini";
 
 let user={
     message:null,
@@ -14,46 +14,37 @@ let user={
         data: null
     }
 }
+ 
+async function generateResponse(aiChatBox) {
 
- async function generateResponse(aiChatBox) {
-  let text = aiChatBox.querySelector(".ai-chat-area");
+let text=aiChatBox.querySelector(".ai-chat-area")
+    let RequestOption={
+        method:"POST",
+        headers:{'Content-Type' : 'application/json'},
+        body:JSON.stringify({
+            "contents":[
+                {"parts":[{text:user.message},(user.file.data?[{inline_data:user.file}]:[])
 
-  const requestBody = {
-    contents: [
-      {
-        parts: [
-          { text: user.message },
-          ...(user.file.data ? [{ inline_data: user.file }] : [])
-        ]
-      }
-    ]
-  };
-
-  try {
-    const response = await fetch(Api_Url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody)
-    });
-
-    const data = await response.json();
-
-    if (!data.reply) {
-      text.innerHTML = "⚠️ Gemini didn't return a response.";
-      throw new Error("Empty or invalid reply from Gemini");
+                ]
+            }]
+        })
     }
-
-    text.innerHTML = data.reply.trim();
-
-  } catch (error) {
-    console.error("AI Chat Error:", error);
-    text.innerHTML = "❌ Failed to get response from AI.";
-  } finally {
-    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
-    image.src = `img.svg`;
-    image.classList.remove("choose");
-    user.file = {};
-  }
+    try{
+        let response= await fetch(Api_Url,RequestOption)
+        let data=await response.json()
+       let apiResponse=data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim()
+       text.innerHTML=apiResponse    
+    }
+    catch(error){
+        console.log(error);
+        
+    }
+    finally{
+        chatContainer.scrollTo({top:chatContainer.scrollHeight,behavior:"smooth"})
+        image.src=`img.svg`
+        image.classList.remove("choose")
+        user.file={}
+    }
 }
 
 
