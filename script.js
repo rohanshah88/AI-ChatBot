@@ -14,48 +14,47 @@ let user={
         data: null
     }
 }
+
  async function generateResponse(aiChatBox) {
-    let text = aiChatBox.querySelector(".ai-chat-area");
+  let text = aiChatBox.querySelector(".ai-chat-area");
 
-    const requestBody = {
-        contents: [
-            {
-                parts: [
-                    { text: user.message },
-                    ...(user.file.data ? [{ inline_data: user.file }] : [])
-                ]
-            }
+  const requestBody = {
+    contents: [
+      {
+        parts: [
+          { text: user.message },
+          ...(user.file.data ? [{ inline_data: user.file }] : [])
         ]
-    };
+      }
+    ]
+  };
 
-    try {
-        const response = await fetch(Api_Url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody)
-        });
+  try {
+    const response = await fetch(Api_Url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        // Safely access the AI's reply
-        const aiReply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (!aiReply) {
-            throw new Error("No valid reply from Gemini");
-        }
-
-        text.innerHTML = aiReply.trim();
-    } catch (error) {
-        console.error("AI Chat Error:", error);
-        text.innerHTML = "❌ Failed to get response from AI.";
-    } finally {
-        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
-        image.src = `img.svg`;
-        image.classList.remove("choose");
-        user.file = {};
+    if (!data.reply) {
+      text.innerHTML = "⚠️ Gemini didn't return a response.";
+      throw new Error("Empty or invalid reply from Gemini");
     }
-}
 
+    text.innerHTML = data.reply.trim();
+
+  } catch (error) {
+    console.error("AI Chat Error:", error);
+    text.innerHTML = "❌ Failed to get response from AI.";
+  } finally {
+    chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
+    image.src = `img.svg`;
+    image.classList.remove("choose");
+    user.file = {};
+  }
+}
 
 
 
