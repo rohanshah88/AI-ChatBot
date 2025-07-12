@@ -31,7 +31,7 @@ A fully functional and intelligent AI chatbot built using **HTML, CSS, JavaScrip
 
 ## 📸 Screenshot
 
-![Gemini Chatbot Preview](C:\Users\Rohan Shah\OneDrive\Desktop\AI-ChatBot\chat.png) <!-- Optional - replace with your actual screenshot -->
+![Gemini Chatbot Preview](chat.png) <!-- Optional - replace with your actual screenshot -->
 
 ---
 
