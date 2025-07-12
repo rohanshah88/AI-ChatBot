@@ -5,6 +5,8 @@ let imagebtn=document.querySelector("#image")
 let image=document.querySelector("#image img")
 let imageinput=document.querySelector("#image input")
 
+const Api_Url = "/.netlify/functions/chatgpt";
+
 let user={
     message:null,
     file:{
@@ -14,36 +16,32 @@ let user={
 }
  
 async function generateResponse(aiChatBox) {
+    let text = aiChatBox.querySelector(".ai-chat-area");
 
-let text=aiChatBox.querySelector(".ai-chat-area")
-    let RequestOption={
-        method:"POST",
-        headers:{'Content-Type' : 'application/json'},
-        body:JSON.stringify({
-            "contents":[
-                {"parts":[{text:user.message},(user.file.data?[{inline_data:user.file}]:[])
-
-                ]
-            }]
+    let RequestOption = {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            message: user.message  // send simple string message
         })
-    }
-    try{
-        let response= await fetch(Api_Url,RequestOption)
-        let data=await response.json()
-       let apiResponse=data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim()
-       text.innerHTML=apiResponse    
-    }
-    catch(error){
-        console.log(error);
-        
-    }
-    finally{
-        chatContainer.scrollTo({top:chatContainer.scrollHeight,behavior:"smooth"})
-        image.src=`img.svg`
-        image.classList.remove("choose")
-        user.file={}
+    };
+
+    try {
+        let response = await fetch(Api_Url, RequestOption);
+        let data = await response.json();
+        let apiResponse = data.reply.trim();
+        text.innerHTML = apiResponse;
+    } catch (error) {
+        console.log("Error fetching response:", error);
+        text.innerHTML = "Sorry, I couldn’t get a response. 😓";
+    } finally {
+        chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: "smooth" });
+        image.src = `img.svg`;
+        image.classList.remove("choose");
+        user.file = {};
     }
 }
+
 
 
 
